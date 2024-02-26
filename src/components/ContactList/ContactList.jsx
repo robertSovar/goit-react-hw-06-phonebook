@@ -1,5 +1,5 @@
-import PropTypes from 'prop-types';
-import styles from '../ContactList/ContactList.module.css';
+import PropTypes from "prop-types";
+import styles from "../ContactList/ContactList.module.css";
 
 const ContactList = ({ contacts, deleteContact }) => (
   <ul className={styles.contactListSection}>
@@ -23,10 +23,14 @@ const ContactList = ({ contacts, deleteContact }) => (
 );
 
 ContactList.propTypes = {
-  name: PropTypes.string,
-  number: PropTypes.string,
-  id: PropTypes.string,
-  deleteContact: PropTypes.func,
+  contacts: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      number: PropTypes.string.isRequired,
+    })
+  ).isRequired,
+  deleteContact: PropTypes.func.isRequired,
 };
 
 export default ContactList;

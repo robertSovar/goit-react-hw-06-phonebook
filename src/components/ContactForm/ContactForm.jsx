@@ -1,25 +1,29 @@
-import PropTypes from 'prop-types';
-import styles from '../ContactForm/ContactForm.module.css';
-import { useState } from 'react';
+import PropTypes from "prop-types";
+import styles from "../ContactForm/ContactForm.module.css";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { addContact } from "../../redux/slices/contactsSlice";
+import { nanoid } from "nanoid";
 
-const ContactForm = ({ onSubmit }) => {
-  const [name, setName] = useState('');
-  const [number, setNumber] = useState('');
+const ContactForm = () => {
+  const [name, setName] = useState("");
+  const [number, setNumber] = useState("");
+  const dispatch = useDispatch();
 
-  const handleChange = event => {
+  const handleChange = (event) => {
     const { name, value } = event.currentTarget;
-    if (name === 'name') {
+    if (name === "name") {
       setName(value);
-    } else if (name === 'number') {
+    } else if (name === "number") {
       setNumber(value);
     }
   };
 
-  const handleSubmit = event => {
+  const handleSubmit = (event) => {
     event.preventDefault();
-    onSubmit({ name, number });
-    setName('');
-    setNumber('');
+    dispatch(addContact({ id: nanoid(), name, number }));
+    setName("");
+    setNumber("");
   };
 
   return (

@@ -1,55 +1,58 @@
-import React, { useEffect, useState } from "react";
-import { nanoid } from "nanoid";
+// App.js
+import React, { useEffect } from "react";
+import { nanoid } from "@reduxjs/toolkit";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  saveContacts,
+  selectContacts,
+  addContact,
+  deleteContact,
+} from "../redux/slices/contactsSlice";
+import { setFilter } from "../redux/slices/filterSlice";
 import ContactForm from "./ContactForm/ContactForm";
 import ContactList from "./ContactList/ContactList";
 import Filter from "./Filter/Filter";
 import styles from "./App.module.css";
 
-const SAVED_CONTACTS = "contact";
-
 const App = () => {
-  const [contacts, setContacts] = useState([
-    { id: "id-1", name: "Rosie Simpson", number: "459-12-56" },
-    { id: "id-2", name: "Hermione Kline", number: "443-89-12" },
-    { id: "id-3", name: "Eden Clements", number: "645-17-79" },
-    { id: "id-4", name: "Annie Copeland", number: "227-91-26" },
-  ]);
-  const [filter, setFilter] = useState("");
+  const contacts = useSelector(selectContacts);
+  const filter = useSelector((state) => state.filter);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    const data = localStorage.getItem(SAVED_CONTACTS);
-
+    const data = localStorage.getItem("contact");
     if (data) {
-      setContacts(JSON.parse(data));
+      dispatch(saveContacts(JSON.parse(data)));
     }
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
-    localStorage.setItem(SAVED_CONTACTS, JSON.stringify(contacts));
+    localStorage.setItem("contact", JSON.stringify(contacts));
   }, [contacts]);
 
-  const formSubmit = ({ name, number }) => {
+  const formSubmit = () => {
+    const existingContact = contacts.find(
+      (c) =>
+        c.name.toLowerCase() === contacts.name.toLowerCase() &&
+        c.number === contacts.number
+    );
+
+    if (existingContact) {
+      alert(`${contacts.name} is already in contacts`);
+      return;
+    }
+
     const contact = {
       id: nanoid(),
       name,
       number,
     };
-    if (
-      contacts.some(
-        (i) =>
-          (i.name.toLowerCase() === contact.name.toLowerCase() &&
-            i.number === contact.number) ||
-          i.number === contact.number
-      )
-    ) {
-      alert(`${name} is already in contacts`);
-    } else {
-      setContacts((prevContacts) => [contact, ...prevContacts]);
-    }
+
+    dispatch(addContact(contact));
   };
 
   const changeFilterInput = (e) => {
-    setFilter(e.target.value);
+    dispatch(setFilter(e.target.value));
   };
 
   const findContacts = () => {
@@ -59,10 +62,8 @@ const App = () => {
     );
   };
 
-  const deleteContact = (id) => {
-    setContacts((prevContacts) =>
-      prevContacts.filter((contact) => contact.id !== id)
-    );
+  const handleDeleteContact = (id) => {
+    dispatch(deleteContact(id));
   };
 
   return (
@@ -71,7 +72,10 @@ const App = () => {
       <ContactForm onSubmit={formSubmit} />
       <h2>Contacts</h2>
       <Filter filter={filter} changeFilterInput={changeFilterInput} />
-      <ContactList contacts={findContacts()} deleteContact={deleteContact} />
+      <ContactList
+        contacts={findContacts()}
+        deleteContact={handleDeleteContact}
+      />
     </section>
   );
 };
