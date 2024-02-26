@@ -30,15 +30,13 @@ const App = () => {
     localStorage.setItem("contact", JSON.stringify(contacts));
   }, [contacts]);
 
-  const formSubmit = () => {
-    const existingContact = contacts.find(
-      (c) =>
-        c.name.toLowerCase() === contacts.name.toLowerCase() &&
-        c.number === contacts.number
+  const formSubmit = (name, number) => {
+    const noCapitalName = name.toLowerCase();
+    const existingContact = contacts.some(
+      (contact) => contact.name.toLowerCase() === noCapitalName
     );
-
     if (existingContact) {
-      alert(`${contacts.name} is already in contacts`);
+      alert(`${name} is already in contacts`);
       return;
     }
 
@@ -69,7 +67,7 @@ const App = () => {
   return (
     <section className={styles.mainSection}>
       <h1>Phonebook</h1>
-      <ContactForm onSubmit={formSubmit} />
+      <ContactForm onAddContact={formSubmit} />
       <h2>Contacts</h2>
       <Filter filter={filter} changeFilterInput={changeFilterInput} />
       <ContactList
